@@ -1,0 +1,37 @@
+.program write
+
+loop:
+    pull block          ;8ns
+    out pins, 5         ;8ns
+    out x, 27           ;8ns
+    jmp !x loop         ;8ns
+    delay:          
+        jmp x-- delay    ;8ns * n  
+        jmp loop       ;8ns
+
+        ;CURRENT EQUATION 40 + 8n ns
+        
+
+
+
+
+% c-sdk {
+static inline void write_program_init(PIO pio, uint sm, uint offset) {
+
+    pio_sm_config c = write_program_get_default_config(offset);
+
+    sm_config_set_out_pins(&c, 0, 5);
+
+    pio_gpio_init(pio, 0);
+    pio_gpio_init(pio, 1);
+    pio_gpio_init(pio, 2);
+    pio_gpio_init(pio, 3);
+    pio_gpio_init(pio, 4);
+
+    pio_sm_set_consecutive_pindirs(pio, sm, 0, 5, true);
+
+    pio_sm_init(pio, sm, offset, &c);
+
+    pio_sm_set_enabled(pio, sm, true);
+}
+%}
